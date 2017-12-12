@@ -10,14 +10,14 @@ import random
 p = psutil.Process(os.getpid())
 
 '''
-REFLAG learns an embedding jointly from structural contexts and attribute contexts
+GAT2VEC learns an embedding jointly from structural contexts and attribute contexts
 employing a single layer of neural network.
 '''
 
 
 class gat2vec(object):
     def __init__(self, dataset):
-        print "Initializing reflag"
+        print "Initializing gat2vec"
         self.dataset = dataset
         self._seed = 1
         self.dataset_dir = os.getcwd() + "/data/" + dataset + "/"
@@ -72,27 +72,27 @@ class gat2vec(object):
         walks_structure, num_str_nodes = self._get_random_walks(nwalks, wlength)
         if label:
             print "Training on Labelled Data"
-            reflag_model = self.train_labelled_reflag(data, walks_structure, num_str_nodes, nwalks, wlength, dsize, wsize, output)
+            gat2vec_model = self.train_labelled_gat2vec(data, walks_structure, num_str_nodes, nwalks, wlength, dsize, wsize, output)
         else:
             print "------------ATTRIBUTE walk--- "
-            fname = "./embeddings/" + self.dataset + "_reflag.emb"
+            fname = "./embeddings/" + self.dataset + "_gat2vec.emb"
             walks_attribute, num_atr_nodes = self._get_random_walks(nwalks, wlength * 2, False, 'na')
             filter_walks = self._filter_walks(walks_attribute, num_str_nodes)
             walks = walks_structure + filter_walks
-            reflag_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
-        return reflag_model
+            gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
+        return gat2vec_model
 
 
     ''' Trains on labelled dataset, i.e class labels are used as an attribute '''
 
-    def train_labelled_reflag(self, data, walks_structure, num_str_nodes, nwalks, wlength, dsize, wsize, output,
-                              evaluate=True):
+    def train_labelled_gat2vec(self, data, walks_structure, num_str_nodes, nwalks, wlength, dsize, wsize, output,
+                               evaluate=True):
         alloutput = pd.DataFrame()
         for tr in self.TR:
             f_ext = "_label_" + str(int(tr * 100)) + '_na'
             walks_attribute, num_atr_nodes = self._get_random_walks(nwalks, wlength * 2, True, f_ext)
             filter_walks = self._filter_walks(walks_attribute, num_str_nodes)
             walks = walks_structure + filter_walks
-            fname = "./embeddings/" + self.dataset + "_reflag_label_" + str(int(tr * 100)) + ".emb"
-            reflag_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
-        return reflag_model
+            fname = "./embeddings/" + self.dataset + "_gat2vec_label_" + str(int(tr * 100)) + ".emb"
+            gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
+        return gat2vec_model
