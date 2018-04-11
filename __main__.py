@@ -14,6 +14,9 @@ def main():
     parser.add_argument('--label', nargs='?', default=False, type=bool,
                         help=' If data is labelled')
 
+    parser.add_argument('--algo', nargs='?', default='g2v', type=str,
+                        help=' Algo to use (gat2vec/gat2vec_bip')
+
     parser.add_argument('--num-walks', default=10, type=int,
                         help='Random walks per node')
 
@@ -32,10 +35,22 @@ def main():
 
 if __name__ == "__main__":
     args = main()
-    g2v = gat2vec(args.data)
-    model = g2v.train_gat2vec(args.data, args.label, args.num_walks, args.walk_length, args.dimension,
+    g2v = gat2vec(args.data, args.label)
+    if args.algo == 'g2v':
+        model = g2v.train_gat2vec(args.data,  args.num_walks, args.walk_length, args.dimension,
+                                 args.window_size, args.output)
+    else:
+        model = g2v.train_gat2vec_bip(args.data, args.num_walks, args.walk_length, args.dimension,
                                  args.window_size, args.output)
 
     ''' for blogcatalog set multilabel = True'''
-    c_eval = Classification(args.data, multilabel=False)
-    c_eval.evaluate(model, args.label)
+    if args.data == 'blogcatalog':
+        multilabel = True
+    else:
+        multilabel = False
+
+    c_eval = Classification(args.data, multilabel)
+    result_df = c_eval.evaluate(model, args.label)
+    print "Results ....."
+    print result_df
+    # g2v.param_walklen_nwalks('joint', args.data)

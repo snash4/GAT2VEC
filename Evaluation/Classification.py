@@ -93,9 +93,9 @@ class Classification:
             pred_labels.append(labels_)
         return self. binarizelabels(pred_labels, nclasses)
 
-    def getPredictions(self, clf, X_train, X_test, Y_train):
+    def getPredictions(self, clf, X_train, X_test, Y_train, Y_test):
         if self.multi_label:
-            return self.fit_and_predict_multilabel(clf, X_train, X_test, Y_train)
+            return self.fit_and_predict_multilabel(clf, X_train, X_test, Y_train, Y_test)
         else:
             clf.fit(X_train, Y_train) #for multi-class classification
             return clf.predict(X_test)
@@ -126,7 +126,7 @@ class Classification:
         for train_idx, test_idx in ss.split(self.labels):
             X_train, X_test, Y_train, Y_test = embedding[train_idx], embedding[test_idx], \
                                                self.labels[train_idx], self.labels[test_idx]
-            pred = self.getPredictions(clf, X_train, X_test, Y_train)
+            pred = self.getPredictions(clf, X_train, X_test, Y_train, Y_test)
             gat2vecAcc.append(self._get_accuracy(Y_test, pred))
             gat2vecF1micro.append(self._get_f1micro(Y_test, pred))
             gat2vecF1macro.append(self.getF1macro(Y_test, pred))
@@ -159,4 +159,6 @@ class Classification:
 
         print "results"
         outDf = pd.DataFrame(output)
-        print outDf
+        return outDf
+
+
