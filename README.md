@@ -28,6 +28,7 @@ To learn a representation using labels.
 2. #python __main__.py --data M10 --label True
 
 To learn a representation only using bi-partite graph
+
 3. #python __main__.py --data M10 --algo g2vbip
 
 
