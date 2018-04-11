@@ -27,6 +27,9 @@ To learn a representation using labels.
 
 2. #python __main__.py --data M10 --label True
 
+To learn a representation only using bi-partite graph
+3. #python __main__.py --data M10 --algo g2vbip
+
 
 PS: The pre-processing code for generating structural and bipartite graph will be uploaded soon
     My python code has influence of Java :)
