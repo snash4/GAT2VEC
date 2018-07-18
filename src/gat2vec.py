@@ -18,16 +18,16 @@ employing a single layer of neural network.
 
 class gat2vec(object):
     def __init__(self, dataset, label):
-        print "Initializing gat2vec"
+        print("Initializing gat2vec")
         self.dataset = dataset
         self._seed = 1
         self.dataset_dir = os.getcwd() + "/data/" + dataset + "/"
         self.TR = [0.1, 0.3, 0.5]
         self.label = label
-        print "loading structural graph"
+        print("loading structural graph")
         self.Gs = self._get_graph()
         if self.label == False:
-            print "loading attribute graph"
+            print("loading attribute graph")
             self.Ga = self._get_graph('na')
 
     '''
@@ -36,7 +36,7 @@ class gat2vec(object):
 
     def _get_graph(self, gtype='graph'):
         fname_struct = self.dataset_dir + self.dataset + '_' + gtype + '.adjlist'
-        print fname_struct
+        print(fname_struct)
         G = graph.load_adjacencylist(fname_struct)
         print("Number of nodes: {}".format(len(G.nodes())))
         return G
@@ -61,26 +61,26 @@ class gat2vec(object):
     ''' Trains jointly attribute contexts and structural contexts'''
 
     def _train_word2Vec(self, walks, dimension_size, window_size, cores, output, fname):
-        print "Learning Representation"
+        print("Learning Representation")
         model = Word2Vec([map(str, walk) for walk in walks],
                          size=dimension_size, window=window_size, min_count=0, sg=1,
                          workers=cores)
         if output is True:
             model.wv.save_word2vec_format(fname)
-            print "Learned Represenation Saved"
+            print("Learned Represenation Saved")
             return fname
         return model
 
     def train_gat2vec(self, data, nwalks, wlength, dsize, wsize, output):
-        print "Random Walks on Structural Graph"
+        print("Random Walks on Structural Graph")
         walks_structure = self._get_random_walks(self.Gs, nwalks, wlength)
         num_str_nodes = len(self.Gs.nodes())
         if self.label:
-            print "Training on Labelled Data"
+            print("Training on Labelled Data")
             gat2vec_model = self.train_labelled_gat2vec(data, walks_structure, num_str_nodes,
                                                         nwalks, wlength, dsize, wsize, output)
         else:
-            print "------------ATTRIBUTE walk--- "
+            print("------------ATTRIBUTE walk--- ")
             fname = "./embeddings/" + self.dataset + "_gat2vec.emb"
             walks_attribute = self._get_random_walks(self.Ga, nwalks, wlength * 2)
             filter_walks = self._filter_walks(walks_attribute, num_str_nodes)
@@ -109,9 +109,9 @@ class gat2vec(object):
     ''' Trains on the bipartite graph only'''
 
     def train_gat2vec_bip(self, data, nwalks, wlength, dsize, wsize, output):
-        print "Learning Representation on Bipartite Graph"
+        print("Learning Representation on Bipartite Graph")
         num_str_nodes = len(self.Gs.nodes())
-        print "Random Walking..."
+        print("Random Walking...")
         walks_attribute = self._get_random_walks(self.Ga, nwalks, wlength * 2)
         filter_walks = self._filter_walks(walks_attribute, num_str_nodes)
         fname = "./embeddings/" + self.dataset + "_gat2vec_bip.emb"
@@ -120,7 +120,7 @@ class gat2vec(object):
 
     def param_walklen_nwalks(self, param, data, nwalks=10, wlength=80, dsize=128, wsize=5,
                              output=True):
-        print "PARAMETER SENSITIVTY ON " + param
+        print("PARAMETER SENSITIVTY ON " + param)
         alloutput = pd.DataFrame()
         # p_value = [40,80,120,160,200]
         # p_value = [5, 10, 15, 20, 25]
@@ -130,19 +130,19 @@ class gat2vec(object):
         wlength = 80
         # nwalks = 10
         num_str_nodes = len(self.Gs.nodes())
-        print "performing joint on both graphs..."
+        print("performing joint on both graphs...")
         for nwalks in p_value:
-            print nwalks
+            print(nwalks)
             walks_st.append(self._get_random_walks(self.Gs, nwalks, wlength))
             walks_attribute = self._get_random_walks(self.Ga, nwalks, wlength * 2)
             walks_at.append(self._filter_walks(walks_attribute, num_str_nodes))
 
-        print "Walks finished.... "
+        print("Walks finished.... ")
         for i, walks_structure in enumerate(walks_st):
             for j, filter_walks in enumerate(walks_at):
                 ps = p_value[i]
                 pa = p_value[j]
-                print "parameters.... ", ps, pa
+                print("parameters.... ", ps, pa)
                 walks = walks_structure + filter_walks
                 fname = "./embeddings/" + self.dataset + "_gat2vec_" + param + "_nwalks_" + str(
                     ps) + str(pa) + ".emb"
@@ -150,7 +150,7 @@ class gat2vec(object):
                 p = (ps, pa)
                 alloutput = self._param_evaluation(data, alloutput, p, param, gat2vec_model)
 
-        print alloutput
+        print(alloutput)
         alloutput.to_csv(data + "_paramsens_" + param + "_nwalks_" + ".csv", index=False)
         return gat2vec_model
 
