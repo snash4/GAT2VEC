@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from deepwalk import graph
 from gensim.models import Word2Vec
 import os

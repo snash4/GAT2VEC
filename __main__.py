@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from src.gat2vec import gat2vec
 from Evaluation.Classification import Classification
@@ -52,6 +54,6 @@ if __name__ == "__main__":
 
     c_eval = Classification(args.data, multilabel)
     result_df = c_eval.evaluate(model, args.label)
-    print "Results ....."
-    print result_df
+    print("Results .....")
+    print(result_df)
     # g2v.param_walklen_nwalks('joint', args.data)
