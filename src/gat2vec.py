@@ -5,7 +5,7 @@ from gensim.models import Word2Vec
 import os
 import pandas as pd
 import random
-from Evaluation.Classification import Classification
+from src.evaluation.classification import Classification
 
 
 class gat2vec(object):

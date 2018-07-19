@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from src.gat2vec import gat2vec
-from Evaluation.Classification import Classification
+from src.evaluation.classification import Classification
 
 
 def main():
