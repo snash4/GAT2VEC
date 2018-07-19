@@ -18,9 +18,9 @@ class Classification:
         self.dataset_dir = os.getcwd() + "/data/" + dataset + "/"
         self.multi_label = multilabel
         if self.multi_label:
-            self.labels = self.get_multilabels()
+            self.labels, self.label_count = self.get_multilabels()
         else:
-            self.labels = self.get_labels()
+            self.labels, self.label_count = self.get_labels()
 
     def get_labels(self):
         """ returns list of labels ordered by the node id's """
@@ -34,23 +34,25 @@ class Classification:
         node_list = lblmap.keys()
         node_list.sort()
         labels = [lblmap[vid] for vid in node_list]
-        return np.array(labels)
+        return np.array(labels), len(set(labels))
 
     def get_multilabels(self, delim='\t'):
         """ returns the multibinarized object for multilabel datasets."""
         lblmap = {}
         fname = self.dataset_dir + 'labels_maped.txt'
+        unique_labels = set()
         with open(fname, 'r') as freader:
             lines = csv.reader(freader, delimiter=delim)
             for row in lines:
                 lbls = str(row[1]).split(',')
                 vid = int(row[0])
                 lblmap[vid] = tuple(lbls)
+                unique_labels.update(set(lbls))
 
         nlist = lblmap.keys()
         nlist.sort()
         labels = [lblmap[vid] for vid in nlist]
-        return self.binarize_labels(labels)
+        return self.binarize_labels(labels), len(unique_labels)
 
     def binarize_labels(self, labels, nclasses=None):
         """ returns the multilabelbinarizer object"""
@@ -105,7 +107,7 @@ class Classification:
             self.output["accuracy"].append(accuracy_score(Y_test, pred))
             self.output["f1micro"].append(f1_score(Y_test, pred, average='micro'))
             self.output["f1macro"].append(f1_score(Y_test, pred, average='macro'))
-            if len(np.unique(self.labels)) == 2:
+            if self.label_count == 2:
                 self.output["auc"].append(roc_auc_score(Y_test, probs[:, 1]))
             else:
                 self.output["auc"].append(0)
@@ -135,4 +137,4 @@ class Classification:
             probs_ = y_pred_probs[i, :]
             labels_ = tuple(np.argsort(probs_).tolist()[-k:])
             pred_labels.append(labels_)
-        return self.binarize_labels(pred_labels, nclasses)
+        return self.binarize_labels(pred_labels, nclasses), y_pred_probs
