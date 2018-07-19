@@ -33,15 +33,16 @@ def main():
                         help='Window size of skipgram model.')
     return parser.parse_args()
 
+
 if __name__ == "__main__":
     args = main()
     g2v = gat2vec(args.data, args.label)
     if args.algo == 'g2v':
-        model = g2v.train_gat2vec(args.data,  args.num_walks, args.walk_length, args.dimension,
-                                 args.window_size, args.output)
+        model = g2v.train_gat2vec(args.num_walks, args.walk_length, args.dimension,
+                                  args.window_size, args.output)
     else:
-        model = g2v.train_gat2vec_bip(args.data, args.num_walks, args.walk_length, args.dimension,
-                                 args.window_size, args.output)
+        model = g2v.train_gat2vec_bip(args.num_walks, args.walk_length, args.dimension,
+                                      args.window_size, args.output)
 
     ''' for blogcatalog set multilabel = True'''
     if args.data == 'blogcatalog':
