@@ -33,6 +33,10 @@ def main():
 
     parser.add_argument('--window-size', default=5, type=int,
                         help='Window size of skipgram model.')
+
+    parser.add_argument('--multilabel', nargs='?', default=False, type=bool,
+                        help='True if one node has multiple labels')
+
     return parser.parse_args()
 
 
@@ -46,14 +50,8 @@ if __name__ == "__main__":
         model = g2v.train_gat2vec_bip(args.num_walks, args.walk_length, args.dimension,
                                       args.window_size, args.output)
 
-    ''' for blogcatalog set multilabel = True'''
-    if args.data == 'blogcatalog':
-        multilabel = True
-    else:
-        multilabel = False
-
-    c_eval = Classification(args.data, multilabel)
+    c_eval = Classification(args.data, args.multilabel)
     result_df = c_eval.evaluate(model, args.label)
     print("Results .....")
     print(result_df)
-    # g2v.param_walklen_nwalks('joint', args.data)
+    # g2v.param_walklen_nwalks('joint', args.data, is_multilabel=args.multilabel)

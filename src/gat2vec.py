@@ -108,7 +108,7 @@ class gat2vec(object):
         return gat2vec_model
 
     def param_walklen_nwalks(self, param, data, nwalks=10, wlength=80, dsize=128, wsize=5,
-                             output=True):
+                             output=True, is_multilabel=False):
         print("PARAMETER SENSITIVTY ON " + param)
         alloutput = pd.DataFrame()
         p_value = [1, 5, 10, 15, 20, 25]
@@ -131,21 +131,18 @@ class gat2vec(object):
                 pa = p_value[j]
                 print("parameters.... ", ps, pa)
                 walks = walks_structure + filter_walks
-                fname = paths.get_embedding_path_param(self.dataset,param, ps, pa)
+                fname = paths.get_embedding_path_param(self.dataset, param, ps, pa)
                 gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
                 p = (ps, pa)
-                alloutput = self._param_evaluation(data, alloutput, p, param, gat2vec_model)
+                alloutput = self._param_evaluation(data, alloutput, p, param, gat2vec_model,
+                                                   is_multilabel)
 
         print(alloutput)
         alloutput.to_csv(paths.get_param_csv_path(self.dataset, param), index=False)
         return gat2vec_model
 
-    def _param_evaluation(self, data, alloutput, param_val, param_name, model):
-        if data == 'blogcatalog':
-            multilabel = True
-        else:
-            multilabel = False
-        eval = Classification(data, multilabel)
+    def _param_evaluation(self, data, alloutput, param_val, param_name, model, is_multilabel):
+        eval = Classification(data, is_multilabel)
         outDf = eval.evaluate(model, False)
         outDf['ps'] = param_val[0]
         outDf['pa'] = param_val[1]
