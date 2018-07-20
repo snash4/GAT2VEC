@@ -6,6 +6,7 @@ import os
 import pandas as pd
 import random
 from src.evaluation.classification import Classification
+from src import paths
 
 
 class gat2vec(object):
@@ -18,7 +19,7 @@ class gat2vec(object):
         print("Initializing gat2vec")
         self.dataset = dataset
         self._seed = 1
-        self.dataset_dir = os.getcwd() + "/data/" + dataset + "/"
+        self.dataset_dir = paths.get_dataset_dir(dataset)
         self.TR = [0.1, 0.3, 0.5]
         self.label = label
         print("loading structural graph")
@@ -30,7 +31,7 @@ class gat2vec(object):
     def _get_graph(self, gtype='graph'):
         """ load the adjacency list.
         """
-        fname_struct = self.dataset_dir + self.dataset + '_' + gtype + '.adjlist'
+        fname_struct = paths.get_adjlist_path(self.dataset_dir, self.dataset, gtype)
         print(fname_struct)
         G = graph.load_adjacencylist(fname_struct)
         print("Number of nodes: {}".format(len(G.nodes())))
@@ -72,7 +73,7 @@ class gat2vec(object):
                                                         dsize, wsize, output)
         else:
             print("Random Walks on Attribute Graph")
-            fname = "./embeddings/" + self.dataset + "_gat2vec.emb"
+            fname = paths.get_embedding_path(self.dataset)
             gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, walks_structure,
                                                 wlength, wsize)
         return gat2vec_model
@@ -82,7 +83,7 @@ class gat2vec(object):
         for tr in self.TR:
             f_ext = "label_" + str(int(tr * 100)) + '_na'
             self.Ga = self._get_graph(f_ext)
-            fname = "./embeddings/" + self.dataset + "_gat2vec_label_" + str(int(tr * 100)) + ".emb"
+            fname = paths.get_embedding_path_wl(self.dataset, tr)
             gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, walks_structure,
                                                 wlength, wsize)
         return gat2vec_model  # TODO: can also return None
@@ -90,7 +91,7 @@ class gat2vec(object):
     def train_gat2vec_bip(self, nwalks, wlength, dsize, wsize, output):
         """ Trains on the bipartite graph only"""
         print("Learning Representation on Bipartite Graph")
-        fname = "./embeddings/" + self.dataset + "_gat2vec_bip.emb"
+        fname = paths.get_embedding_path_bip(self.dataset)
         gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, None, wlength, wsize,
                                             add_structure=False)
         return gat2vec_model
@@ -130,14 +131,13 @@ class gat2vec(object):
                 pa = p_value[j]
                 print("parameters.... ", ps, pa)
                 walks = walks_structure + filter_walks
-                fname = "./embeddings/" + self.dataset + "_gat2vec_" + param + "_nwalks_" + str(
-                    ps) + str(pa) + ".emb"
+                fname = paths.get_embedding_path_param(self.dataset,param, ps, pa)
                 gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
                 p = (ps, pa)
                 alloutput = self._param_evaluation(data, alloutput, p, param, gat2vec_model)
 
         print(alloutput)
-        alloutput.to_csv(data + "_paramsens_" + param + "_nwalks_" + ".csv", index=False)
+        alloutput.to_csv(paths.get_param_csv_path(self.dataset, param), index=False)
         return gat2vec_model
 
     def _param_evaluation(self, data, alloutput, param_val, param_name, model):

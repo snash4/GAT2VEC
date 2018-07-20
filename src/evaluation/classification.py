@@ -7,6 +7,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.model_selection import ShuffleSplit
 from sklearn import linear_model
 from sklearn import preprocessing
+from src import paths
 
 
 class Classification:
@@ -15,7 +16,7 @@ class Classification:
     def __init__(self, dataset, multilabel=False):
         self.dataset = dataset
         self.output = {"TR": [], "accuracy": [], "f1micro": [], "f1macro": [], "auc": []}
-        self.dataset_dir = os.getcwd() + "/data/" + dataset + "/"
+        self.dataset_dir = paths.get_dataset_dir(dataset)
         self.multi_label = multilabel
         if self.multi_label:
             self.labels, self.label_count = self.get_multilabels()
@@ -25,7 +26,7 @@ class Classification:
     def get_labels(self):
         """ returns list of labels ordered by the node id's """
         lblmap = {}
-        fname = self.dataset_dir + 'labels_maped.txt'
+        fname = paths.get_labels_path(self.dataset_dir)
         with open(fname, 'r') as freader:
             lines = csv.reader(freader, delimiter='\t')
             for row in lines:
@@ -39,7 +40,7 @@ class Classification:
     def get_multilabels(self, delim='\t'):
         """ returns the multibinarized object for multilabel datasets."""
         lblmap = {}
-        fname = self.dataset_dir + 'labels_maped.txt'
+        fname = paths.get_labels_path(self.dataset_dir)
         unique_labels = set()
         with open(fname, 'r') as freader:
             lines = csv.reader(freader, delimiter=delim)
@@ -73,8 +74,7 @@ class Classification:
         for tr in TR:
             print("TR ... ", tr)
             if label:
-                model = "./embeddings/" + self.dataset + "_gat2vec_label_" + str(
-                    int(tr * 100)) + ".emb"
+                model = paths.get_embedding_path_wl(self.dataset, tr)
                 if isinstance(model, str):
                     embedding = self.get_embeddingDF(model)
 
@@ -120,7 +120,6 @@ class Classification:
             return self.fit_and_predict_multilabel(clf, X_train, X_test, Y_train, Y_test)
         else:
             clf.fit(X_train, Y_train)  # for multi-class classification
-            # TODO: return values of multi-label and binary label aren't the same anymore.
             return clf.predict(X_test), clf.predict_proba(X_test)
 
     def fit_and_predict_multilabel(self, clf, X_train, X_test, y_train, y_test):
