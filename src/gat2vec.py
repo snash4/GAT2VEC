@@ -2,7 +2,6 @@ from __future__ import print_function
 
 from deepwalk import graph
 from gensim.models import Word2Vec
-import os
 import pandas as pd
 import random
 from src.evaluation.classification import Classification
@@ -15,12 +14,12 @@ class gat2vec(object):
     employing a single layer of neural network.
     """
 
-    def __init__(self, dataset, label):
+    def __init__(self, dataset, label, tr):
         print("Initializing gat2vec")
         self.dataset = dataset
         self._seed = 1
         self.dataset_dir = paths.get_dataset_dir(dataset)
-        self.TR = [0.1, 0.3, 0.5]
+        self.TR = tr
         self.label = label
         print("loading structural graph")
         self.Gs = self._get_graph()
@@ -98,9 +97,8 @@ class gat2vec(object):
 
     def _train_gat2vec(self, dsize, fname, nwalks, output, walks_structure, wlength, wsize,
                        add_structure=True):
-        num_str_nodes = len(self.Gs.nodes())
         walks_attribute = self._get_random_walks(self.Ga, nwalks, wlength * 2)
-        walks = self._filter_walks(walks_attribute, num_str_nodes)
+        walks = self._filter_walks(walks_attribute, len(self.Gs.nodes()))
         if add_structure:
             walks = walks_structure + walks
         gat2vec_model = self._train_word2Vec([map(str, walk) for walk in walks], dsize, wsize,

@@ -13,9 +13,10 @@ from src import paths
 class Classification:
     """This class performs multi-class/multi-label classification tasks."""
 
-    def __init__(self, dataset, multilabel=False):
+    def __init__(self, dataset, multilabel=False, tr=[0.1, 0.3, 0.5]):
         self.dataset = dataset
         self.output = {"TR": [], "accuracy": [], "f1micro": [], "f1macro": [], "auc": []}
+        self.TR = tr  # the training ratio for classifier
         self.dataset_dir = paths.get_dataset_dir(dataset)
         self.multi_label = multilabel
         if self.multi_label:
@@ -70,8 +71,7 @@ class Classification:
             embedding = self.get_embeddingDF(model)
 
         clf = self.get_classifier()
-        TR = [0.1, 0.3, 0.5]  # the training ratio for classifier
-        for tr in TR:
+        for tr in self.TR:
             print("TR ... ", tr)
             if label:
                 model = paths.get_embedding_path_wl(self.dataset, tr)

@@ -42,7 +42,8 @@ def main():
 
 if __name__ == "__main__":
     args = main()
-    g2v = gat2vec(args.data, args.label)
+    TR = [0.1, 0.3, 0.5]  # the training ratio for classifier
+    g2v = gat2vec(args.data, args.label, tr=TR)
     if args.algo == 'g2v':
         model = g2v.train_gat2vec(args.num_walks, args.walk_length, args.dimension,
                                   args.window_size, args.output)
@@ -50,7 +51,7 @@ if __name__ == "__main__":
         model = g2v.train_gat2vec_bip(args.num_walks, args.walk_length, args.dimension,
                                       args.window_size, args.output)
 
-    c_eval = Classification(args.data, args.multilabel)
+    c_eval = Classification(args.data, args.multilabel, tr=TR)
     result_df = c_eval.evaluate(model, args.label)
     print("Results .....")
     print(result_df)
