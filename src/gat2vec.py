@@ -105,7 +105,7 @@ class gat2vec(object):
                                              8, output, fname)
         return gat2vec_model
 
-    def param_walklen_nwalks(self, param, data, nwalks=10, wlength=80, dsize=128, wsize=5,
+    def param_walklen_nwalks(self, param, data, tr, nwalks=10, wlength=80, dsize=128, wsize=5,
                              output=True, is_multilabel=False):
         print("PARAMETER SENSITIVTY ON " + param)
         alloutput = pd.DataFrame()
@@ -133,14 +133,13 @@ class gat2vec(object):
                 gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
                 p = (ps, pa)
                 alloutput = self._param_evaluation(data, alloutput, p, param, gat2vec_model,
-                                                   is_multilabel)
+                                                   is_multilabel, tr)
 
         print(alloutput)
         alloutput.to_csv(paths.get_param_csv_path(self.dataset, param), index=False)
-        return gat2vec_model
 
-    def _param_evaluation(self, data, alloutput, param_val, param_name, model, is_multilabel):
-        eval = Classification(data, is_multilabel)
+    def _param_evaluation(self, data, alloutput, param_val, param_name, model, is_multilabel, tr):
+        eval = Classification(data, tr, is_multilabel)
         outDf = eval.evaluate(model, False)
         outDf['ps'] = param_val[0]
         outDf['pa'] = param_val[1]
