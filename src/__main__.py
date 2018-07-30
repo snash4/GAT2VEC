@@ -51,8 +51,8 @@ if __name__ == "__main__":
         model = g2v.train_gat2vec_bip(args.num_walks, args.walk_length, args.dimension,
                                       args.window_size, args.output)
 
-    c_eval = Classification(args.data, TR, args.multilabel)
-    result_df = c_eval.evaluate(model, args.label, evaluation_scheme="cv")
+    c_eval = Classification(args.data, args.multilabel, tr=TR)
+    result_df = c_eval.evaluate(model, args.label)
     print("Results .....")
     print(result_df)
-    # g2v.param_walklen_nwalks('joint', args.data, TR, is_multilabel=args.multilabel)
+    # g2v.param_walklen_nwalks('joint', args.data, is_multilabel=args.multilabel)
