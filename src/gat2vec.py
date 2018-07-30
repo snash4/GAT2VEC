@@ -101,8 +101,7 @@ class gat2vec(object):
         walks = self._filter_walks(walks_attribute, len(self.Gs.nodes()))
         if add_structure:
             walks = walks_structure + walks
-        gat2vec_model = self._train_word2Vec([map(str, walk) for walk in walks], dsize, wsize,
-                                             8, output, fname)
+        gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 4, output, fname)
         return gat2vec_model
 
     def param_walklen_nwalks(self, param, data, tr, nwalks=10, wlength=80, dsize=128, wsize=5,
