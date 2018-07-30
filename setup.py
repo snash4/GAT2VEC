@@ -46,7 +46,9 @@ TESTS_REQUIRE = [
 ]
 ENTRY_POINTS = {
     'console_scripts': [
-        # 'gat2vec = gat2vec.cli:main',
+        'gat2vec = GAT2VEC.cli:main',
+        # 'gat2vec_build = GAT2VEC.cli:build_gat2vec_model',
+        # 'gat2vec_eval = GAT2VEC.cli:evaluate_gat2vec_model',
     ]
 }
 DEPENDENCY_LINKS = [

@@ -1,58 +1,6 @@
 from __future__ import print_function
 
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from GAT2VEC.gat2vec import gat2vec
-from GAT2VEC.evaluation.classification import Classification
-
-
-def main():
-    parser = ArgumentParser("gat2vec",
-                            formatter_class=ArgumentDefaultsHelpFormatter,
-                            conflict_handler='resolve')
-
-    parser.add_argument('--data', nargs='?', required=True,
-                        help='Input data directory in ../data/ folder')
-
-    parser.add_argument('--label', nargs='?', default=False, type=bool,
-                        help=' If data is labelled')
-
-    parser.add_argument('--algo', nargs='?', default='g2v', type=str,
-                        help=' Algo to use (gat2vec/gat2vec_bip')
-
-    parser.add_argument('--num-walks', default=10, type=int,
-                        help='Random walks per node')
-
-    parser.add_argument('--walk-length', default=80, type=int,
-                        help='Random walk length')
-
-    parser.add_argument('--output', default=True,
-                        help='save output embedding')
-
-    parser.add_argument('--dimension', default=128, type=int,
-                        help='size of representation.')
-
-    parser.add_argument('--window-size', default=5, type=int,
-                        help='Window size of skipgram model.')
-
-    parser.add_argument('--multilabel', nargs='?', default=False, type=bool,
-                        help='True if one node has multiple labels')
-
-    return parser.parse_args()
-
+from GAT2VEC.cli import main
 
 if __name__ == "__main__":
-    args = main()
-    TR = [0.1, 0.3, 0.5]  # the training ratio for classifier
-    g2v = gat2vec(args.data, args.label, tr=TR)
-    if args.algo == 'g2v':
-        model = g2v.train_gat2vec(args.num_walks, args.walk_length, args.dimension,
-                                  args.window_size, args.output)
-    else:
-        model = g2v.train_gat2vec_bip(args.num_walks, args.walk_length, args.dimension,
-                                      args.window_size, args.output)
-
-    c_eval = Classification(args.data, TR, args.multilabel)
-    result_df = c_eval.evaluate(model, args.label, evaluation_scheme="cv")
-    print("Results .....")
-    print(result_df)
-    # g2v.param_walklen_nwalks('joint', args.data, TR, is_multilabel=args.multilabel)
+    main()

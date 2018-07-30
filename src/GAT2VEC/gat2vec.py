@@ -14,11 +14,12 @@ class gat2vec(object):
     employing a single layer of neural network.
     """
 
-    def __init__(self, dataset, label, tr):
+    def __init__(self, input_dir, output_dir, label, tr):
         print("Initializing gat2vec")
-        self.dataset = dataset
+        self.dataset = paths.get_dataset_name(input_dir)
         self._seed = 1
-        self.dataset_dir = paths.get_dataset_dir(dataset)
+        self.dataset_dir = input_dir
+        self.output_dir = output_dir
         self.TR = tr
         self.label = label
         print("loading structural graph")
@@ -30,7 +31,7 @@ class gat2vec(object):
     def _get_graph(self, gtype='graph'):
         """ load the adjacency list.
         """
-        fname_struct = paths.get_adjlist_path(self.dataset_dir, self.dataset, gtype)
+        fname_struct = paths.get_adjlist_path(self.dataset_dir, gtype)
         print(fname_struct)
         G = graph.load_adjacencylist(fname_struct)
         print("Number of nodes: {}".format(len(G.nodes())))
@@ -72,7 +73,7 @@ class gat2vec(object):
                                                         dsize, wsize, output)
         else:
             print("Random Walks on Attribute Graph")
-            fname = paths.get_embedding_path(self.dataset)
+            fname = paths.get_embedding_path(self.dataset_dir, self.output_dir)
             gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, walks_structure,
                                                 wlength, wsize)
         return gat2vec_model
@@ -82,7 +83,7 @@ class gat2vec(object):
         for tr in self.TR:
             f_ext = "label_" + str(int(tr * 100)) + '_na'
             self.Ga = self._get_graph(f_ext)
-            fname = paths.get_embedding_path_wl(self.dataset, tr)
+            fname = paths.get_embedding_path_wl(self.dataset_dir, self.output_dir, tr)
             gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, walks_structure,
                                                 wlength, wsize)
         return gat2vec_model  # TODO: can also return None
@@ -90,7 +91,7 @@ class gat2vec(object):
     def train_gat2vec_bip(self, nwalks, wlength, dsize, wsize, output):
         """ Trains on the bipartite graph only"""
         print("Learning Representation on Bipartite Graph")
-        fname = paths.get_embedding_path_bip(self.dataset)
+        fname = paths.get_embedding_path_bip(self.dataset_dir, self.output_dir)
         gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, None, wlength, wsize,
                                             add_structure=False)
         return gat2vec_model
@@ -129,17 +130,19 @@ class gat2vec(object):
                 pa = p_value[j]
                 print("parameters.... ", ps, pa)
                 walks = walks_structure + filter_walks
-                fname = paths.get_embedding_path_param(self.dataset, param, ps, pa)
+                fname = paths.get_embedding_path_param(self.dataset_dir, self.output_dir, param, ps,
+                                                       pa)
                 gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
                 p = (ps, pa)
-                alloutput = self._param_evaluation(data, alloutput, p, param, gat2vec_model,
-                                                   is_multilabel, tr)
+                alloutput = self._param_evaluation(data, self.output_dir, alloutput, p, param,
+                                                   gat2vec_model, is_multilabel, tr)
 
         print(alloutput)
         alloutput.to_csv(paths.get_param_csv_path(self.dataset, param), index=False)
 
-    def _param_evaluation(self, data, alloutput, param_val, param_name, model, is_multilabel, tr):
-        eval = Classification(data, tr, is_multilabel)
+    def _param_evaluation(self, data, output_dir, alloutput, param_val, param_name, model,
+                          is_multilabel, tr):
+        eval = Classification(data, output_dir, tr, is_multilabel)
         outDf = eval.evaluate(model, False)
         outDf['ps'] = param_val[0]
         outDf['pa'] = param_val[1]

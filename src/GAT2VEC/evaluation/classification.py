@@ -14,11 +14,12 @@ from GAT2VEC import paths
 class Classification:
     """This class performs multi-class/multi-label classification tasks."""
 
-    def __init__(self, dataset, tr, multilabel=False):
-        self.dataset = dataset
+    def __init__(self, dataset_dir, output_dir, tr, multilabel=False):
+        self.dataset = paths.get_dataset_name(dataset_dir)
         self.output = {"TR": [], "accuracy": [], "f1micro": [], "f1macro": [], "auc": []}
         self.TR = tr  # the training ratio for classifier
-        self.dataset_dir = paths.get_dataset_dir(dataset)
+        self.dataset_dir = dataset_dir
+        self.output_dir = output_dir
         self.multi_label = multilabel
         if self.multi_label:
             self.labels, self.label_ind, self.label_count = self.get_multilabels()
@@ -80,7 +81,7 @@ class Classification:
             for tr in self.TR:
                 print("TR ... ", tr)
                 if label:
-                    model = paths.get_embedding_path_wl(self.dataset, tr)
+                    model = paths.get_embedding_path_wl(self.dataset_dir,self.output_dir, tr)
                     if isinstance(model, str):
                         embedding = self.get_embeddingDF(model)
                 results.update(self.evaluate_tr(clf, embedding, tr))
