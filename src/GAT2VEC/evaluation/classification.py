@@ -8,7 +8,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.model_selection import ShuffleSplit, StratifiedKFold
 from sklearn import linear_model
 from sklearn import preprocessing
-from src import paths
+from GAT2VEC import paths
 
 
 class Classification:

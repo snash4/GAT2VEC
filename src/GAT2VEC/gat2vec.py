@@ -4,8 +4,8 @@ from deepwalk import graph
 from gensim.models import Word2Vec
 import pandas as pd
 import random
-from src.evaluation.classification import Classification
-from src import paths
+from GAT2VEC.evaluation.classification import Classification
+from GAT2VEC import paths
 
 
 class gat2vec(object):

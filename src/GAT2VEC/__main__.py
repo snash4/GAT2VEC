@@ -1,8 +1,8 @@
 from __future__ import print_function
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from src.gat2vec import gat2vec
-from src.evaluation.classification import Classification
+from GAT2VEC.gat2vec import gat2vec
+from GAT2VEC.evaluation.classification import Classification
 
 
 def main():
