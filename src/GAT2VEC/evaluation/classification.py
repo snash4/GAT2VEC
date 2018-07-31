@@ -84,6 +84,7 @@ class Classification:
 
     def evaluate_cv(self, clf, embedding, n_splits):
         """Do a repeated stratified cross validation.
+
         :param clf: Classifier object.
         :param embedding: The feature matrix.
         :param n_splits: Number of folds.
