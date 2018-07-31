@@ -27,15 +27,15 @@ CLASSIFIERS = [
     'Topic :: Scientific/Engineering :: Bio-Informatics'
 ]
 INSTALL_REQUIRES = [
-    'Cython==0.21.2',
-    'gensim==1.0.1',
-    'numpy==1.12.1',
-    'pandas==0.17.0',
-    'scikit-learn==0.18.1',
-    'scipy==0.19.0',
-    'psutil>=5.2.0',
-    'argparse>=1.2.1',
-    'deepwalk==1.0.2',
+    'Cython',
+    'gensim',
+    'numpy',
+    'pandas',
+    'scikit-learn',
+    'scipy',
+    'psutil',
+    'argparse',
+    'deepwalk',
 ]
 
 EXTRAS_REQUIRE = {
@@ -85,7 +85,7 @@ def find_meta(meta):
 
 
 def get_long_description():
-    """Get the long_description from the README.rst file. Assume UTF-8 encoding."""
+    """Get the long_description from the README.md file. Assume UTF-8 encoding."""
     with codecs.open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
         long_description = f.read()
     return long_description

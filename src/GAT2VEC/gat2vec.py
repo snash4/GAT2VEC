@@ -47,7 +47,7 @@ class gat2vec(object):
         """ filter attribute nodes from walks in attributed graph."""
         filter_walks = []
         for walk in walks:
-            if walk[0] <= node_num:
+            if int(walk[0]) <= node_num:
                 fwalks = [nid for nid in walk if int(nid) <= node_num]
                 filter_walks.append(fwalks)
         return filter_walks
@@ -55,7 +55,7 @@ class gat2vec(object):
     def _train_word2Vec(self, walks, dimension_size, window_size, cores, output, fname):
         """ Trains jointly attribute contexts and structural contexts."""
         print("Learning Representation")
-        model = Word2Vec([map(str, walk) for walk in walks],
+        model = Word2Vec([list(map(str, walk)) for walk in walks],
                          size=dimension_size, window=window_size, min_count=0, sg=1,
                          workers=cores)
         if output is True:
@@ -102,8 +102,7 @@ class gat2vec(object):
         walks = self._filter_walks(walks_attribute, len(self.Gs.nodes()))
         if add_structure:
             walks = walks_structure + walks
-        gat2vec_model = self._train_word2Vec([map(str, walk) for walk in walks], dsize, wsize,
-                                             8, output, fname)
+        gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 4, output, fname)
         return gat2vec_model
 
     def param_walklen_nwalks(self, param, data, tr, nwalks=10, wlength=80, dsize=128, wsize=5,

@@ -58,6 +58,6 @@ def build_gat2vec_model(TR, args):
 
 def evaluate_gat2vec_model(TR, args, model):
     c_eval = Classification(args.data, args.output_dir, TR, args.multilabel)
-    result_df = c_eval.evaluate(model, args.label, evaluation_scheme="cv")
+    result_df = c_eval.evaluate(model, args.label, evaluation_scheme="tr")
     print("Results .....")
     print(result_df)

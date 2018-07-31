@@ -35,7 +35,7 @@ class Classification:
             for row in lines:
                 lblmap[int(row[0])] = int(row[1])
 
-        node_list = lblmap.keys()
+        node_list = list(lblmap.keys())
         node_list.sort()
         labels = [lblmap[vid] for vid in node_list]
         return np.array(labels), node_list, len(set(labels))
@@ -53,7 +53,7 @@ class Classification:
                 lblmap[vid] = tuple(lbls)
                 unique_labels.update(set(lbls))
 
-        nlist = lblmap.keys()
+        nlist = list(lblmap.keys())
         nlist.sort()
         labels = [lblmap[vid] for vid in nlist]
         return self.binarize_labels(labels), nlist, len(unique_labels)
@@ -100,7 +100,7 @@ class Classification:
 
     def get_classifier(self):
         """ returns the classifier"""
-        log_reg = linear_model.LogisticRegression(n_jobs=8)
+        log_reg = linear_model.LogisticRegression()
         ors = OneVsRestClassifier(log_reg)
         return ors
 
