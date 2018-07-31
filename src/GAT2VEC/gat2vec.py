@@ -1,11 +1,9 @@
 from __future__ import print_function
 
 from deepwalk import graph
-from gensim.models import Word2Vec
-import pandas as pd
-import random
-from GAT2VEC.evaluation.classification import Classification
 from GAT2VEC import parsers, paths
+from gensim.models import Word2Vec
+import random
 
 
 class Gat2Vec(object):
@@ -95,45 +93,3 @@ class Gat2Vec(object):
             walks = walks_structure + walks
         gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 4, output, fname)
         return gat2vec_model
-
-    def param_walklen_nwalks(self, param, data, tr, nwalks=10, wlength=80, dsize=128, wsize=5,
-                             output=True, is_multilabel=False):
-        print("PARAMETER SENSITIVTY ON " + param)
-        alloutput = pd.DataFrame()
-        p_value = [1, 5, 10, 15, 20, 25]
-        walks_st = []
-        walks_at = []
-        wlength = 80
-        # nwalks = 10
-        num_str_nodes = len(self.Gs.nodes())
-        print("performing joint on both graphs...")
-        for nwalks in p_value:
-            print(nwalks)
-            walks_st.append(self._get_random_walks(self.Gs, nwalks, wlength))
-            walks_attribute = self._get_random_walks(self.Ga, nwalks, wlength * 2)
-            walks_at.append(self._filter_walks(walks_attribute, num_str_nodes))
-
-        print("Walks finished.... ")
-        for i, walks_structure in enumerate(walks_st):
-            for j, filter_walks in enumerate(walks_at):
-                ps = p_value[i]
-                pa = p_value[j]
-                print("parameters.... ", ps, pa)
-                walks = walks_structure + filter_walks
-                fname = paths.get_embedding_path_param(self.dataset_dir, self.output_dir, param, ps,
-                                                       pa)
-                gat2vec_model = self._train_word2Vec(walks, dsize, wsize, 8, output, fname)
-                p = (ps, pa)
-                alloutput = self._param_evaluation(data, self.output_dir, alloutput, p, param,
-                                                   gat2vec_model, is_multilabel, tr)
-
-        print(alloutput)
-        alloutput.to_csv(paths.get_param_csv_path(self.dataset, param), index=False)
-
-    def _param_evaluation(self, data, output_dir, alloutput, param_val, param_name, model,
-                          is_multilabel, tr):
-        eval = Classification(data, output_dir, tr, is_multilabel)
-        outDf = eval.evaluate(model, False)
-        outDf['ps'] = param_val[0]
-        outDf['pa'] = param_val[1]
-        return alloutput.append(outDf)

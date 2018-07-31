@@ -1,6 +1,8 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from GAT2VEC.gat2vec import Gat2Vec
+
 from GAT2VEC.evaluation.classification import Classification
+from GAT2VEC.evaluation.param_evaluation import param_walklen_nwalks
+from GAT2VEC.gat2vec import Gat2Vec
 
 
 def main():
@@ -42,7 +44,7 @@ def main():
     TR = [0.1, 0.3, 0.5]  # the training ratio for classifier
     model = build_gat2vec_model(TR, args)
     evaluate_gat2vec_model(TR, args, model)
-    # g2v.param_walklen_nwalks('joint', args.data, TR, is_multilabel=args.multilabel)
+    # param_walklen_nwalks('joint', args.data, args.output_dir, TR, is_multilabel=args.multilabel)
 
 
 def build_gat2vec_model(TR, args):
