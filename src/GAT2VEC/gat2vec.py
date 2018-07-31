@@ -8,7 +8,7 @@ from GAT2VEC.evaluation.classification import Classification
 from GAT2VEC import paths
 
 
-class gat2vec(object):
+class Gat2Vec(object):
     """
     GAT2VEC learns an embedding jointly from structural contexts and attribute contexts
     employing a single layer of neural network.

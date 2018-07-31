@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from GAT2VEC.gat2vec import gat2vec
+from GAT2VEC.gat2vec import Gat2Vec
 from GAT2VEC.evaluation.classification import Classification
 
 
@@ -46,7 +46,7 @@ def main():
 
 
 def build_gat2vec_model(TR, args):
-    g2v = gat2vec(args.data, args.output_dir, args.label, tr=TR)
+    g2v = Gat2Vec(args.data, args.output_dir, args.label, tr=TR)
     if args.algo == 'g2v':
         model = g2v.train_gat2vec(args.num_walks, args.walk_length, args.dimension,
                                   args.window_size, args.output)
