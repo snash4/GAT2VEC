@@ -2,13 +2,13 @@ from collections import defaultdict
 
 import pandas as pd
 import numpy as np
-import csv
 from sklearn.metrics import f1_score, accuracy_score, roc_auc_score
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.model_selection import ShuffleSplit, StratifiedKFold
 from sklearn import linear_model
 from sklearn import preprocessing
 from GAT2VEC import paths
+from GAT2VEC import parsers
 
 
 class Classification:
@@ -22,41 +22,10 @@ class Classification:
         self.output_dir = output_dir
         self.multi_label = multilabel
         if self.multi_label:
-            self.labels, self.label_ind, self.label_count = self.get_multilabels()
+            self.labels, self.label_ind, self.label_count = parsers.get_multilabels(self.dataset_dir)
+            self.labels = self.binarize_labels(self.labels)
         else:
-            self.labels, self.label_ind, self.label_count = self.get_labels()
-
-    def get_labels(self):
-        """ returns list of labels ordered by the node id's """
-        lblmap = {}
-        fname = paths.get_labels_path(self.dataset_dir)
-        with open(fname, 'r') as freader:
-            lines = csv.reader(freader, delimiter='\t')
-            for row in lines:
-                lblmap[int(row[0])] = int(row[1])
-
-        node_list = list(lblmap.keys())
-        node_list.sort()
-        labels = [lblmap[vid] for vid in node_list]
-        return np.array(labels), node_list, len(set(labels))
-
-    def get_multilabels(self, delim='\t'):
-        """ returns the multibinarized object for multilabel datasets."""
-        lblmap = {}
-        fname = paths.get_labels_path(self.dataset_dir)
-        unique_labels = set()
-        with open(fname, 'r') as freader:
-            lines = csv.reader(freader, delimiter=delim)
-            for row in lines:
-                lbls = str(row[1]).split(',')
-                vid = int(row[0])
-                lblmap[vid] = tuple(lbls)
-                unique_labels.update(set(lbls))
-
-        nlist = list(lblmap.keys())
-        nlist.sort()
-        labels = [lblmap[vid] for vid in nlist]
-        return self.binarize_labels(labels), nlist, len(unique_labels)
+            self.labels, self.label_ind, self.label_count = parsers.get_labels(self.dataset_dir)
 
     def binarize_labels(self, labels, nclasses=None):
         """ returns the multilabelbinarizer object"""
@@ -72,7 +41,7 @@ class Classification:
         clf = self.get_classifier()
 
         if not label:
-            embedding = self.get_embeddingDF(model)
+            embedding = parsers.get_embeddingDF(model)
 
         if evaluation_scheme == "cv":
             results = self.evaluate_cv(clf, embedding, 5)
@@ -81,22 +50,15 @@ class Classification:
             for tr in self.TR:
                 print("TR ... ", tr)
                 if label:
-                    model = paths.get_embedding_path_wl(self.dataset_dir,self.output_dir, tr)
+                    model = paths.get_embedding_path_wl(self.dataset_dir, self.output_dir, tr)
                     if isinstance(model, str):
-                        embedding = self.get_embeddingDF(model)
+                        embedding = parsers.get_embeddingDF(model)
                 results.update(self.evaluate_tr(clf, embedding, tr))
 
         print("Training Finished")
 
         df = pd.DataFrame(results)
         return df.groupby(axis=0, by="TR").mean()
-
-    def get_embeddingDF(self, fname):
-        """returns the embeddings read from file fname."""
-        df = pd.read_csv(fname, header=None, skiprows=1, delimiter=' ')
-        df.sort_values(by=[0], inplace=True)
-        df = df.set_index(0)
-        return df.as_matrix(columns=df.columns[0:])
 
     def get_classifier(self):
         """ returns the classifier"""
@@ -127,7 +89,7 @@ class Classification:
         :param n_splits: Number of folds.
         :return: Dictionary containing numerical results of the classification.
         """
-        embedding  = embedding[self.label_ind, :]
+        embedding = embedding[self.label_ind, :]
         results = defaultdict(list)
         for i in range(10):
             rskf = StratifiedKFold(n_splits=n_splits, shuffle=True)
@@ -143,7 +105,6 @@ class Classification:
                 else:
                     results["auc"].append(0)
         return results
-
 
     def _get_split(self, embedding, test_id, train_id):
         return embedding[train_id], embedding[test_id], self.labels[train_id], self.labels[test_id]

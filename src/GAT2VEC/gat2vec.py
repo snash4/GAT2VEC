@@ -5,7 +5,7 @@ from gensim.models import Word2Vec
 import pandas as pd
 import random
 from GAT2VEC.evaluation.classification import Classification
-from GAT2VEC import paths
+from GAT2VEC import parsers, paths
 
 
 class Gat2Vec(object):
@@ -23,19 +23,10 @@ class Gat2Vec(object):
         self.TR = tr
         self.label = label
         print("loading structural graph")
-        self.Gs = self._get_graph()
+        self.Gs = parsers.get_graph(self.dataset_dir)
         if not self.label:
             print("loading attribute graph")
-            self.Ga = self._get_graph('na')
-
-    def _get_graph(self, gtype='graph'):
-        """ load the adjacency list.
-        """
-        fname_struct = paths.get_adjlist_path(self.dataset_dir, gtype)
-        print(fname_struct)
-        G = graph.load_adjacencylist(fname_struct)
-        print("Number of nodes: {}".format(len(G.nodes())))
-        return G
+            self.Ga = parsers.get_graph(self.dataset_dir, 'na')
 
     def _get_random_walks(self, G, num_walks, wlength):
         """return random walks."""
@@ -82,7 +73,7 @@ class Gat2Vec(object):
         """ Trains on labelled dataset, i.e class labels are used as an attribute """
         for tr in self.TR:
             f_ext = "label_" + str(int(tr * 100)) + '_na'
-            self.Ga = self._get_graph(f_ext)
+            self.Ga = parsers.get_graph(self.dataset_dir, f_ext)
             fname = paths.get_embedding_path_wl(self.dataset_dir, self.output_dir, tr)
             gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, walks_structure,
                                                 wlength, wsize)
