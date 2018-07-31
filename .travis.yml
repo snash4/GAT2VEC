@@ -2,8 +2,9 @@ sudo: false
 cache: pip
 language: python
 python:
-- 2.7
+- 3.6
 - 3.4
+- 2.7
 stages:
   - lint
   - docs
@@ -16,9 +17,7 @@ jobs:
     - env: TOXENV=pylint
     # docs stage
     - stage: docs
-      env: TOXENV=doc8
     - env: TOXENV=readme
-    - env: TOXENV=docs
 matrix:
   allow_failures:
       - env: TOXENV=flake8
