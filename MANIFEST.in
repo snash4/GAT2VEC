@@ -1,0 +1,8 @@
+graft src
+graft tests
+prune data
+prune embeddings
+
+global-exclude *.py[cod] __pycache__ *.so *.dylib .DS_Store *.gpickle
+
+include *.rst *.txt *.yml tox.ini .flake8
