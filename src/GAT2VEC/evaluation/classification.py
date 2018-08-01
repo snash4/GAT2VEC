@@ -97,7 +97,7 @@ class Classification:
             for train_idx, test_idx in rskf.split(embedding, self.labels):
                 X_train, X_test, Y_train, Y_test = self._get_split(embedding, test_idx, train_idx)
                 pred, probs = self.get_predictions(clf, X_train, X_test, Y_train, Y_test)
-                results["TR"].append(n_splits)
+                results["TR"].append(i)
                 results["accuracy"].append(accuracy_score(Y_test, pred))
                 results["f1micro"].append(f1_score(Y_test, pred, average='micro'))
                 results["f1macro"].append(f1_score(Y_test, pred, average='macro'))
