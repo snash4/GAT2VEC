@@ -6,4 +6,6 @@ scikit-learn
 scipy
 psutil
 argparse
-deepwalk
+
+# Use a patched version of deepwalk that doesn't use concurrency in file I/O
+-e git+https://github.com/cthoyt/deepwalk@patch-2#egg=deepwalk
