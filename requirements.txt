@@ -8,4 +8,4 @@ psutil
 argparse
 
 # Use a patched version of deepwalk that doesn't use concurrency in file I/O
--e git+https://github.com/cthoyt/deepwalk@patch-2#egg=deepwalk
+-e git+https://github.com/phanein/deepwalk#egg=deepwalk
