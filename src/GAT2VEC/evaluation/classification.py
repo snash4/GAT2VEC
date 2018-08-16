@@ -108,7 +108,7 @@ class Classification:
                     results["auc"].append(0)
         return results
 
-    def get_prediction_probs_for_entire_set(self, model, output):
+    def get_prediction_probs_for_entire_set(self, model):
         embedding = parsers.get_embeddingDF(model)
         embedding = embedding[self.label_ind, :]
 
