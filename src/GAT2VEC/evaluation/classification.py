@@ -108,12 +108,18 @@ class Classification:
                     results["auc"].append(0)
         return results
 
-    def write_prediction_probs_for_entire_set(self, model, output):
-        clf = self.get_classifier()
+    def get_prediction_probs_for_entire_set(self, model, output):
         embedding = parsers.get_embeddingDF(model)
-        pred, probs = self.get_predictions(clf, embedding, self.labels, embedding, self.labels)
-        df = pd.DataFrame(probs)
-        df.write_csv(output, sep="\t")
+        embedding = embedding[self.label_ind, :]
+
+        log_reg = linear_model.LogisticRegression()
+        clf = OneVsRestClassifier(log_reg)
+
+        clf.fit(embedding, self.labels)  # for multi-class classification
+        probs = clf.predict_proba(embedding)
+        print(roc_auc_score(self.labels, probs[:, 1]))
+
+        return probs
 
     def _get_split(self, embedding, test_id, train_id):
         return embedding[train_id], embedding[test_id], self.labels[train_id], self.labels[test_id]
