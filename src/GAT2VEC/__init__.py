@@ -1,7 +1,5 @@
 
-"""Tool for analyzing gene expression using a protein protein interaction network."""
-
-__version__ = ''
+__version__ = '0.0.1-dev'
 
 __title__ = 'GAT2VEC'
 __description__ = ''
