@@ -7,7 +7,6 @@ python:
 - 2.7
 stages:
   - lint
-  - docs
 jobs:
   include:
     # lint stage
@@ -15,9 +14,6 @@ jobs:
       env: TOXENV=manifest
     - env: TOXENV=flake8
     - env: TOXENV=pylint
-    # docs stage
-    - stage: docs
-    - env: TOXENV=readme
 matrix:
   allow_failures:
       - env: TOXENV=flake8
