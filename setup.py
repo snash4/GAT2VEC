@@ -35,7 +35,6 @@ INSTALL_REQUIRES = [
     'scipy',
     'psutil',
     'argparse',
-    'deepwalk',
 ]
 
 EXTRAS_REQUIRE = {
@@ -52,7 +51,7 @@ ENTRY_POINTS = {
     ]
 }
 DEPENDENCY_LINKS = [
-
+    'https://github.com/phanein/deepwalk/tarball/master#egg=deepwalk'
 ]
 
 PACKAGE_DATA = {
