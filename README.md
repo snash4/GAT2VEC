@@ -20,17 +20,17 @@ DATA FORMAT
 
 USAGE:
 To learn a representation without using label information. 
-
+```
 1. #python __main__.py --data M10
-
+```
 To learn a representation using labels.
-
+```
 2. #python __main__.py --data M10 --label True
-
+```
 To learn a representation only using bi-partite graph
-
+```
 3. #python __main__.py --data M10 --algo g2vbip
-
+```
 ## Paper
 Please cite our paper if you find the code useful for your research.
 
@@ -45,6 +45,7 @@ Please cite our paper if you find the code useful for your research.
 	pdfurl = {https://link.springer.com/content/pdf/10.1007/s00607-018-0622-9.pdf},	
 	publisher = {Springer},
 }
+```
 
 PS: The pre-processing code for generating structural and bipartite graph will be uploaded soon
     My python code has influence of Java :)
