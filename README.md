@@ -31,6 +31,20 @@ To learn a representation only using bi-partite graph
 
 3. #python __main__.py --data M10 --algo g2vbip
 
+## Paper
+Please cite our paper if you find the code useful for your research.
+
+```
+@inproceedings{gat2vec,
+  booktitle="Journal of Computing",
+	author = {Sheikh, Nasrullah and Kefato, Zekarias T. and Montresor, Alberto},
+	title = "gat2vec: Representation Learning for Attributed Graphs",
+	month = May,
+	year = 2018,
+	type = {JOURNAL},
+	pdfurl = {https://link.springer.com/content/pdf/10.1007/s00607-018-0622-9.pdf},	
+	publisher = {Springer},
+}
 
 PS: The pre-processing code for generating structural and bipartite graph will be uploaded soon
     My python code has influence of Java :)
