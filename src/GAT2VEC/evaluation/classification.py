@@ -118,7 +118,7 @@ class Classification:
         embedding = parsers.get_embeddingDF(model)
         embedding = embedding[self.label_ind, :]
 
-        log_reg = linear_model.LogisticRegression()
+        log_reg = linear_model.LogisticRegression(solver='lbfgs')
         clf = OneVsRestClassifier(log_reg)
 
         clf.fit(embedding, self.labels)  # for multi-class classification
