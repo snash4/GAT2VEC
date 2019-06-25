@@ -69,7 +69,7 @@ class Classification:
 
     def get_classifier(self):
         """ returns the classifier"""
-        log_reg = linear_model.LogisticRegression()
+        log_reg = linear_model.LogisticRegression(solver='lbfgs')
         ors = OneVsRestClassifier(log_reg)
         return ors
 
