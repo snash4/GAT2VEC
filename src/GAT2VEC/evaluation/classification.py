@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 import pandas as pd
@@ -7,8 +8,13 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.model_selection import ShuffleSplit, StratifiedKFold
 from sklearn import linear_model
 from sklearn import preprocessing
+
 from GAT2VEC import paths
 from GAT2VEC import parsers
+
+__all__ = ['Classification']
+
+logger = logging.getLogger(__name__)
 
 
 class Classification:
@@ -49,14 +55,14 @@ class Classification:
         elif evaluation_scheme == "tr" or label:
             results = defaultdict(list)
             for tr in self.TR:
-                print("TR ... ", tr)
+                logger.debug("TR ... %s", tr)
                 if label:
                     model = paths.get_embedding_path_wl(self.dataset_dir, self.output_dir, tr)
                     if isinstance(model, str):
                         embedding = parsers.get_embeddingDF(model)
                 results.update(self.evaluate_tr(clf, embedding, tr))
 
-        print("Training Finished")
+        logger.debug("Training Finished")
 
         df = pd.DataFrame(results)
         return df.groupby(axis=0, by="TR").mean()
@@ -117,7 +123,7 @@ class Classification:
 
         clf.fit(embedding, self.labels)  # for multi-class classification
         probs = clf.predict_proba(embedding)
-        print(roc_auc_score(self.labels, probs[:, 1]))
+        logger.debug('ROC: %.2f', roc_auc_score(self.labels, probs[:, 1]))
 
         return probs
 

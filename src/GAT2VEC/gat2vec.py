@@ -1,10 +1,11 @@
-from __future__ import print_function
+import logging
+import random
 
 from deepwalk import graph
 from GAT2VEC import parsers, paths
 from gensim.models import Word2Vec
-import random
 
+logger = logging.getLogger(__name__)
 
 class Gat2Vec(object):
     """
@@ -13,17 +14,17 @@ class Gat2Vec(object):
     """
 
     def __init__(self, input_dir, output_dir, label, tr):
-        print("Initializing gat2vec")
+        logger.debug("Initializing gat2vec")
         self.dataset = paths.get_dataset_name(input_dir)
         self._seed = 1
         self.dataset_dir = input_dir
         self.output_dir = output_dir
         self.TR = tr
         self.label = label
-        print("loading structural graph")
+        logger.debug("loading structural graph")
         self.Gs = parsers.get_graph(self.dataset_dir)
         if not self.label:
-            print("loading attribute graph")
+            logger.debug("loading attribute graph")
             self.Ga = parsers.get_graph(self.dataset_dir, 'na')
 
     def _get_random_walks(self, G, num_walks, wlength):
@@ -43,25 +44,25 @@ class Gat2Vec(object):
 
     def _train_word2Vec(self, walks, dimension_size, window_size, cores, output, fname):
         """ Trains jointly attribute contexts and structural contexts."""
-        print("Learning Representation")
+        logger.debug("Learning Representation")
         model = Word2Vec([list(map(str, walk)) for walk in walks],
                          size=dimension_size, window=window_size, min_count=0, sg=1,
                          workers=cores)
         if output is True:
             model.wv.save_word2vec_format(fname)
-            print("Learned Representation Saved")
+            logger.debug("Learned Representation Saved")
             return fname
         return model
 
     def train_gat2vec(self, nwalks, wlength, dsize, wsize, output):
-        print("Random Walks on Structural Graph")
+        logger.debug("Random Walks on Structural Graph")
         walks_structure = self._get_random_walks(self.Gs, nwalks, wlength)
         if self.label:
-            print("Training on Labelled Data")
+            logger.debug("Training on Labelled Data")
             gat2vec_model = self.train_labelled_gat2vec(walks_structure, nwalks, wlength,
                                                         dsize, wsize, output)
         else:
-            print("Random Walks on Attribute Graph")
+            logger.debug("Random Walks on Attribute Graph")
             fname = paths.get_embedding_path(self.dataset_dir, self.output_dir)
             gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, walks_structure,
                                                 wlength, wsize)
@@ -79,7 +80,7 @@ class Gat2Vec(object):
 
     def train_gat2vec_bip(self, nwalks, wlength, dsize, wsize, output):
         """ Trains on the bipartite graph only"""
-        print("Learning Representation on Bipartite Graph")
+        logger.debug("Learning Representation on Bipartite Graph")
         fname = paths.get_embedding_path_bip(self.dataset_dir, self.output_dir)
         gat2vec_model = self._train_gat2vec(dsize, fname, nwalks, output, None, wlength, wsize,
                                             add_structure=False)
