@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score, roc_auc_score
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.model_selection import ShuffleSplit, StratifiedKFold
+from sklearn.model_selection import ShuffleSplit, StratifiedKFold, GridSearchCV
 from sklearn import linear_model
 from sklearn import preprocessing
 from GAT2VEC import paths
@@ -93,9 +93,23 @@ class Classification:
         """
         embedding = embedding[self.label_ind, :]
         results = defaultdict(list)
+        grid = {
+            'C': np.logspace(-4, 4, 20),
+            'tol': [0.0001, 0.001, 0.01]
+        }
+        log_reg = linear_model.LogisticRegression(solver='liblinear')
+
+        # tol, C
         for i in range(10):
-            rskf = StratifiedKFold(n_splits=n_splits, shuffle=True)
-            for train_idx, test_idx in rskf.split(embedding, self.labels):
+            inner_cv = StratifiedKFold(n_splits=n_splits, shuffle=True)
+            outer_cv = StratifiedKFold(n_splits=n_splits, shuffle=True)
+
+            for train_idx, test_idx in outer_cv.split(embedding, self.labels):
+                clf = GridSearchCV(estimator=log_reg, param_grid=grid, cv=inner_cv, iid=False)
+                clf.fit(embedding, self.labels)
+
+                print('Parameter fitting done. clf: {}'.format(clf))
+
                 X_train, X_test, Y_train, Y_test = self._get_split(embedding, test_idx, train_idx)
                 pred, probs = self.get_predictions(clf, X_train, X_test, Y_train, Y_test)
                 results["TR"].append(i)
@@ -128,7 +142,8 @@ class Classification:
         if self.multi_label:
             return self.fit_and_predict_multilabel(clf, X_train, X_test, Y_train, Y_test)
         else:
-            clf.fit(X_train, Y_train)  # for multi-class classification
+            # clf.fit(X_train, Y_train)  # for multi-class classification
+            print(clf)
             return clf.predict(X_test), clf.predict_proba(X_test)
 
     def fit_and_predict_multilabel(self, clf, X_train, X_test, y_train, y_test):
