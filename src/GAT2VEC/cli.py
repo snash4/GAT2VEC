@@ -1,7 +1,6 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 from GAT2VEC.evaluation.classification import Classification
-from GAT2VEC.evaluation.param_evaluation import param_walklen_nwalks
 from GAT2VEC.gat2vec import Gat2Vec
 
 
