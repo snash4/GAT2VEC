@@ -1,0 +1,24 @@
+sudo: false
+cache: pip
+language: python
+python:
+- 3.6
+- 3.4
+- 2.7
+stages:
+  - lint
+jobs:
+  include:
+    # lint stage
+    - stage: lint
+      env: TOXENV=manifest
+    - env: TOXENV=flake8
+    - env: TOXENV=pylint
+matrix:
+  allow_failures:
+      - env: TOXENV=flake8
+      - env: TOXENV=pylint
+install:
+  - pip install tox
+script:
+  - tox
