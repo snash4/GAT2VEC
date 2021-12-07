@@ -46,7 +46,7 @@ class Gat2Vec(object):
         """ Trains jointly attribute contexts and structural contexts."""
         logger.debug("Learning Representation")
         model = Word2Vec([list(map(str, walk)) for walk in walks],
-                         size=dimension_size, window=window_size, min_count=0, sg=1,
+                         vector_size=dimension_size, window=window_size, min_count=0, sg=1,
                          workers=cores)
         if output is True:
             model.wv.save_word2vec_format(fname)
